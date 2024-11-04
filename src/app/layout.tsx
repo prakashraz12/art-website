@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-
 import "./globals.css";
-import Navbar from "@/components/ui/navbar/navbar.component";
+import { Toaster } from "@/components/ui/toaster";
+import Footer from "@/components/footer/footer";
 
 const Fonts = Montserrat({
   subsets: ["latin"],
@@ -22,8 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${Fonts.className} antialiased`}>
-        <Navbar />
+        <Toaster />
         {children}
+        <Footer/>
       </body>
     </html>
   );

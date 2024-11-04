@@ -1,113 +1,224 @@
-'use client'
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
-import { Expand, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import ArtworkDetail from "./art-work-detail.component"
+import { useState } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 
 interface GalleryItem {
-  id: string
-  title: string
-  description: string
-  imageUrl: string
+  id: string;
+  imageUrl: string;
 }
 
 const galleryItems: GalleryItem[] = [
   {
     id: "1",
-    title: "Abstract Harmony",
-    description: "A vibrant exploration of color and form.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530576/opbbddatby1wcl7wphai.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530576/opbbddatby1wcl7wphai.jpg",
   },
   {
     id: "2",
-    title: "Urban Rhythm",
-    description: "Capturing the pulse of city life through abstract strokes.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530576/lvdue8gbp4wuyi0qtzcd.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530576/lvdue8gbp4wuyi0qtzcd.jpg",
   },
   {
     id: "3",
-    title: "Serene Whispers",
-    description: "Soft hues blend to create a calming atmosphere.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530575/m1jxtgnpknhvv3lxkrxr.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530575/m1jxtgnpknhvv3lxkrxr.jpg",
   },
   {
     id: "4",
-    title: "Cosmic Dance",
-    description: "An energetic piece inspired by the movement of celestial bodies.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530573/qrg7frlodlzvgtt5c7jl.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530573/qrg7frlodlzvgtt5c7jl.jpg",
   },
   {
     id: "5",
-    title: "Echoes of Nature",
-    description: "Abstract interpretation of natural landscapes and textures.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530572/f2r5exajp2mbko8io6yv.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530572/f2r5exajp2mbko8io6yv.jpg",
   },
   {
     id: "6",
-    title: "Emotional Spectrum",
-    description: "A journey through the colors of human emotions.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530572/bplvwkbsmaucg0wdx71g.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530572/bplvwkbsmaucg0wdx71g.jpg",
   },
   {
     id: "7",
-    title: "Vibrant Fusion",
-    description: "A bold mix of colors creating an energetic composition.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530570/gx1bheov7y7eeovchc3f.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530570/gx1bheov7y7eeovchc3f.jpg",
   },
   {
     id: "8",
-    title: "Geometric Harmony",
-    description: "Exploring the balance between shapes and hues.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530568/nmgdypy0jglubknzqiyu.png",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530568/nmgdypy0jglubknzqiyu.png",
   },
   {
     id: "9",
-    title: "Ethereal Dreams",
-    description: "A dreamy landscape of soft colors and fluid forms.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530566/wuwegfx0skesxeehpn08.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530566/wuwegfx0skesxeehpn08.jpg",
   },
   {
     id: "10",
-    title: "Textured Reflections",
-    description: "An exploration of texture and light in abstract form.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530565/ks0cp5jkxuj6n0drl5rl.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530565/ks0cp5jkxuj6n0drl5rl.jpg",
   },
   {
     id: "11",
-    title: "Urban Abstractions",
-    description: "City life reimagined through an abstract lens.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530564/txfbavy0jgqmogrt5fv9.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530564/txfbavy0jgqmogrt5fv9.jpg",
   },
   {
     id: "12",
-    title: "Chromatic Symphony",
-    description: "A harmonious blend of colors creating a visual melody.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530565/cwqclxakaljjhacg0le0.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530565/cwqclxakaljjhacg0le0.jpg",
   },
   {
     id: "13",
-    title: "Organic Fluidity",
-    description: "Smooth, flowing forms inspired by nature's patterns.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530562/v4ozqiqoegwovddnhgp1.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530562/v4ozqiqoegwovddnhgp1.jpg",
+  },
+  {
+    id: "29",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530560/bm8smhmt5zwxu8tdzceh.jpg",
   },
   {
     id: "14",
-    title: "Celestial Whispers",
-    description: "An abstract interpretation of cosmic phenomena.",
-    imageUrl: "https://res.cloudinary.com/du1bbws62/image/upload/v1730530560/bm8smhmt5zwxu8tdzceh.jpg",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730550223/xlp5jfylnxycmdydxuae.jpg",
   },
-]
+  {
+    id: "15",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730550223/zcapsz70pe8ftjilp5ip.jpg",
+  },
+  {
+    id: "16",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530569/taa03sdx1f0ypjfcqbhq.jpg",
+  },
+  {
+    id: "17",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530561/lbfu1yxshlhvkq6pnfpv.jpg",
+  },
+  {
+    id: "18",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530556/xafkivke0m3wpok6hjek.jpg",
+  },
+  {
+    id: "19",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530554/jra2usdo9b2l8j0fukvk.jpg",
+  },
+  {
+    id: "20",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530551/wgryh5ybgwrls7tiygr8.jpg",
+  },
+  {
+    id: "21",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530550/g9hgqfztklkk0ezsywie.jpg",
+  },
+  {
+    id: "23",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530550/agwuft2zznoc1ec3tode.jpg",
+  },
+  {
+    id: "24",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530547/rtsllajwgsknsishmgsm.jpg",
+  },
+  {
+    id: "25",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530546/qnnxkrxs63nb9x3fjnpn.jpg",
+  },
+  {
+    id: "26",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530505/riixpmqykryvbsl6tdr9.jpg",
+  },
+  {
+    id: "27",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530504/vhkcaaygtd8rxqez1xkx.jpg",
+  },
+  {
+    id: "22",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530505/yeezlzlul1lfyg1gelea.jpg",
+  },
+  {
+    id: "28",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530579/mnhhazpggvkhdvd8prkp.jpg",
+  },
+  {
+    id: "29",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730554581/kygsdrqc3w004u7rig8l.jpg",
+  },
+  {
+    id: "30",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730554580/h00egtmfzwc5pp3prqxx.jpg",
+  },
+  {
+    id: "31",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730554580/sfqo6ltvvnhkobtxzahi.jpg",
+  },
+  {
+    id: "32",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730554580/yxa3gwhhecwto29qlyg1.jpg",
+  },
+  {
+    id: "33",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730554580/tuh4ies9qtcm5hqkimsh.jpg",
+  },
+  {
+    id: "34",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730554580/casgz3d2qjjdw7wlrbds.jpg",
+  },
+  {
+    id: "35",
+    imageUrl:
+      "https://res.cloudinary.com/du1bbws62/image/upload/v1730530579/vi07bneliwo4ixe0by50.jpg",
+  },
+];
 
 export default function EnhancedAnimatedGallery() {
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [visibleItems, setVisibleItems] = useState(10)
+  const [visibleItems, setVisibleItems] = useState(4);
+  const [fullscreenIndex, setFullscreenIndex] = useState<number | null>(null);
 
   const loadMore = () => {
-    setVisibleItems(prevVisible => Math.min(prevVisible + 4, galleryItems.length))
-  }
+    setVisibleItems((prevVisible) =>
+      Math.min(prevVisible + 4, galleryItems.length)
+    );
+  };
+
+  const openFullscreen = (index: number) => {
+    setFullscreenIndex(index);
+  };
+
+  const closeFullscreen = () => {
+    setFullscreenIndex(null);
+  };
+
+  const navigateFullscreen = (direction: "prev" | "next") => {
+    if (fullscreenIndex === null) return;
+    const newIndex =
+      direction === "prev"
+        ? (fullscreenIndex - 1 + visibleItems) % visibleItems
+        : (fullscreenIndex + 1) % visibleItems;
+    setFullscreenIndex(newIndex);
+  };
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -127,12 +238,14 @@ export default function EnhancedAnimatedGallery() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-gray-600 max-w-2xl"
           >
-            Tempor ac tincidunt feugiat dignissim quis sed donec cursus ornare
-            varius sed sagittis nibh.
+            This is my artwork collection, made from different mediums.
           </motion.p>
         </div>
       </div>
-      <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+      <motion.div
+        layout
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10"
+      >
         <AnimatePresence>
           {galleryItems.slice(0, visibleItems).map((item, index) => (
             <motion.div
@@ -142,15 +255,15 @@ export default function EnhancedAnimatedGallery() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 50 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              onClick={() => setSelectedId(item.id)}
+              onClick={() => openFullscreen(index)}
               className="cursor-pointer relative overflow-hidden shadow-2xl"
               whileHover={{ scale: 1.05 }}
             >
               <Image
                 src={item.imageUrl}
-                alt={item.title}
-                width={400}
-                height={400}
+                alt={item.id}
+                width={300}
+                height={200}
                 className="w-full h-full object-cover"
               />
               <motion.div
@@ -172,41 +285,79 @@ export default function EnhancedAnimatedGallery() {
           transition={{ delay: 0.5 }}
           className="flex justify-center mt-10"
         >
-          <Button onClick={loadMore} size="lg" className="bg-black text-white hover:bg-gray-800">
-            Load More
-          </Button>
+         <button
+            className="group flex flex-col items-center text-gray-600 hover:text-gray-900 transition-colors"
+            onClick={loadMore}
+          >
+            <span className="text-sm uppercase tracking-wider mb-2">
+              Load More
+            </span>
+            <motion.div
+              animate={{
+                y: [0, 5, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            >
+              <ChevronDown className="w-5 h-5" />
+            </motion.div>
+          </button>
         </motion.div>
       )}
 
       <AnimatePresence>
-        {selectedId && (
+        {fullscreenIndex !== null && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-            onClick={() => setSelectedId(null)}
+            className="fixed inset-0 bg-black z-50 flex items-center justify-center"
+            onClick={closeFullscreen}
           >
             <motion.div
-              layoutId={selectedId}
-              className="bg-white p-6 max-w-3xl w-full mx-4 relative"
+              className="relative w-full h-full flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
               <button
-                onClick={() => setSelectedId(null)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                onClick={closeFullscreen}
+                className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
               >
-                <X className="w-6 h-6" />
+                <X className="w-8 h-8" />
               </button>
-              {galleryItems.find((item) => item.id === selectedId) && (
-                <>
-                  <ArtworkDetail/>
-                </>
-              )}
+              <button
+                onClick={() => navigateFullscreen("prev")}
+                className="absolute left-4 text-white hover:text-gray-300 z-10"
+              >
+                <ChevronLeft className="w-12 h-12" />
+              </button>
+              <button
+                onClick={() => navigateFullscreen("next")}
+                className="absolute right-4 text-white hover:text-gray-300 z-10"
+              >
+                <ChevronRight className="w-12 h-12" />
+              </button>
+              <motion.div
+                key={fullscreenIndex}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3 }}
+                className="w-full h-full flex items-center justify-center"
+              >
+                <Image
+                  src={galleryItems[fullscreenIndex].imageUrl}
+                  alt={galleryItems[fullscreenIndex].id}
+                  fill
+                  className="object-contain"
+                />
+              </motion.div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }

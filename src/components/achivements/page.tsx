@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useAnimation, useInView } from "framer-motion";
-import { Users, Globe, Award, TrendingUp } from "lucide-react";
+import { Users, Globe, Award, } from "lucide-react";
 
 interface Achievement {
   icon: React.ElementType;
@@ -15,7 +15,6 @@ const achievements: Achievement[] = [
   { icon: Users, value: 500, label: "Clients", suffix: "+" },
   { icon: Globe, value: 2, label: "International Clients", suffix: "+" },
   { icon: Award, value: 4, label: "Years of Experience", suffix: "+" },
-  { icon: TrendingUp, value: 99, label: "Success Rate", suffix: "%" },
 ];
 
 const CountUp = ({ end, duration = 2 }: { end: number; duration?: number }) => {
@@ -68,7 +67,7 @@ export default function AchievementsSection() {
         </motion.h2>
         <div
           ref={ref}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {achievements.map((achievement, index) => (
             <motion.div

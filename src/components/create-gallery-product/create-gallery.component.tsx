@@ -1,11 +1,10 @@
 "use client";
-
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Image from "next/image";
-import { CalendarIcon, X } from "lucide-react";
+import {  LoaderCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,12 +17,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
+
+import { toast } from "@/hooks/use-toast";
+import { addDoc, collection } from "firebase/firestore";
+import { db, slugGenerator } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const mediumOptions = [
   "Oil",
@@ -40,18 +38,18 @@ const mediumOptions = [
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   inFramePerson: z.string().min(1, "Person in frame is required"),
-  dateAccomplished: z.date({
-    required_error: "Date accomplished is required",
-  }),
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.number().positive("Price must be positive"),
   mediums: z.array(z.string()).min(1, "At least one medium is required"),
-  clientName: z.string().min(1, "Client name is required"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export default function CreateProduct() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [profileImageLoading, setProfileImageLoading] = useState(false);
+  const [imageUplaoding, setImageUploading] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [productImages, setProductImages] = useState<string[]>([]);
 
@@ -67,36 +65,122 @@ export default function CreateProduct() {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log({ ...data, profileImage, productImages });
-    // Here you would typically send this data to your backend
-  };
-
-  const handleProfileImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const onSubmit = async (data: FormValues) => {
+    setLoading(true);
+    try {
+      await addDoc(collection(db, "arts-gallery"), {
+        title: data?.title,
+        description: data?.description,
+        profileImage: profileImage,
+        mediums: data?.mediums,
+        price: data?.price,
+        slug: slugGenerator(data?.title),
+        createdAt: new Date(),
+        images:productImages
+      });
+      router.push("/");
+      toast({
+        title: "Success",
+        description: "Gallery created successfully!",
+      });
+      setProductImages([]);
+      setProfileImage("");
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleProductImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfileImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (file && /^image\//.test(file.type)) {
+      setProfileImageLoading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "prakash-media");
+
+      try {
+        const res = await fetch(
+          "https://api.cloudinary.com/v1_1/du1bbws62/image/upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error("Image upload failed");
+        }
+
+        const data = await res.json();
+        setProfileImage(data.secure_url);
+      } catch (error) {
+        console.log(error);
+        toast({
+          title: "Error",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setProfileImageLoading(false);
+      }
+    }
+  };
+
+  const handleProductImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
-      const readerPromises = filesArray.map((file) => {
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
-        });
-      });
+      setImageUploading(true);
 
-      Promise.all(readerPromises).then((results) => {
-        setProductImages((prev) => [...prev, ...results]);
-      });
+      try {
+        const readerPromises = filesArray.map(async (file) => {
+          if (file && /^image\//.test(file.type)) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "prakash-media");
+
+            const res = await fetch(
+              "https://api.cloudinary.com/v1_1/du1bbws62/image/upload",
+              {
+                method: "POST",
+                body: formData,
+              }
+            );
+
+            if (!res.ok) {
+              throw new Error("Image upload failed");
+            }
+
+            const data = await res.json();
+            return data.secure_url;
+          }
+        });
+
+        const uploadedImages = await Promise.all(readerPromises);
+        setProductImages((prevImages) => [
+          ...prevImages,
+          ...uploadedImages.filter(Boolean),
+        ]);
+      } catch (error) {
+        console.log(error);
+        toast({
+          title: "Error",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setImageUploading(false);
+      }
     }
   };
 
@@ -126,45 +210,7 @@ export default function CreateProduct() {
           )}
         </div>
 
-        <div>
-          <Label>Date Accomplished</Label>
-          <Controller
-            control={control}
-            name="dateAccomplished"
-            render={({ field }) => (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={`w-full justify-start text-left font-normal ${
-                      !field.value && "text-muted-foreground"
-                    }`}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {field.value ? (
-                      format(field.value, "PPP")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  {/* <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    initialFocus
-                  /> */}
-                </PopoverContent>
-              </Popover>
-            )}
-          />
-          {errors.dateAccomplished && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.dateAccomplished.message}
-            </p>
-          )}
-        </div>
+      
 
         <div>
           <Label htmlFor="description">Description</Label>
@@ -232,7 +278,7 @@ export default function CreateProduct() {
                     onClick={() => {
                       const newMediums = control._formValues.mediums.filter(
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (_:any, i:number) => i !== index
+                        (_: any, i: number) => i !== index
                       );
                       control._formValues.mediums = newMediums;
                     }}
@@ -247,16 +293,6 @@ export default function CreateProduct() {
         </div>
 
         <div>
-          <Label htmlFor="clientName">Client Name</Label>
-          <Input id="clientName" {...register("clientName")} />
-          {errors.clientName && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.clientName.message}
-            </p>
-          )}
-        </div>
-
-        <div>
           <Label htmlFor="profileImage">Profile Image</Label>
           <Input
             id="profileImage"
@@ -264,6 +300,11 @@ export default function CreateProduct() {
             onChange={handleProfileImageUpload}
             className="mb-2"
           />
+          {profileImageLoading && (
+            <div className="flex justify-center">
+              <LoaderCircle className="animate-spin" />{" "}
+            </div>
+          )}
           {profileImage && (
             <div className="relative w-32 h-32">
               <Image
@@ -286,7 +327,12 @@ export default function CreateProduct() {
             className="mb-2"
           />
           <div className="grid grid-cols-3 gap-4 mt-2">
-            {productImages.map((img, index) => (
+            {imageUplaoding && (
+              <div className="flex justify-center">
+                <LoaderCircle className="animate-spin" />{" "}
+              </div>
+            )}
+            {productImages?.map((img, index) => (
               <div key={index} className="relative w-full pt-[100%]">
                 <Image
                   src={img}
@@ -306,8 +352,8 @@ export default function CreateProduct() {
           </div>
         </div>
 
-        <Button type="submit" className="w-full">
-          Create Product
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? "Creating..." : "Create Product"}
         </Button>
       </form>
     </div>
