@@ -1,5 +1,6 @@
 import AboutComponent from "@/components/about-section/about-section.component";
 import AchievementsSection from "@/components/achivements/page";
+import EnhancedTestimonialCarousel from "@/components/client-testimonials/client-testimonials";
 import AnimatedGallery from "@/components/gallery/gallery.component";
 import HeroComponent from "@/components/hero/hero-section.component";
 import LatestArtwork from "@/components/latest-works/latest-works.component";
@@ -15,6 +16,7 @@ export default function Home() {
       <LatestArtwork />
       <AnimatedGallery />
       <VideoGallery />
+      <EnhancedTestimonialCarousel/>
       <ContactSection/>
     </main>
   );

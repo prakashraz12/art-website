@@ -26,19 +26,19 @@ export default function ContactSection() {
     {
       icon: <Instagram className="w-6 h-6" />,
       name: "Instagram",
-      value: "@artisthandle",
+      value: "@mr.prakashraz",
       link: "https://www.instagram.com/mr.prakashraz/",
     },
     {
       icon: <Mail className="w-6 h-6" />,
       name: "Email",
-      value: "artist@example.com",
+      value: "rzprakash16@gmail.com",
       link: "mailto:rzprakash16@gmail.com",
     },
     {
       icon: <Linkedin className="w-6 h-6" />,
       name: "LinkedIn",
-      value: "Artist Name",
+      value: "Prakash Raz Shrestha",
       link: "www.linkedin.com/in/prakash-raz-shrestha-a14706172",
     },
   ];
@@ -88,7 +88,7 @@ export default function ContactSection() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Contact Us</DialogTitle>
+                <DialogTitle>Contact Me</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 {contactMethods?.map((method, index) => (
